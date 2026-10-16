@@ -1,0 +1,11 @@
+# West/CMake build directories (default "build", plus any "build-*" variants)
+/build/
+/build-*/
+/app/build/
+/app/build-*/
+
+# Hex/binary outputs copied out of a build directory
+*.hex
+*.bin
+*.elf
+*.map

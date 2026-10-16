@@ -1,0 +1,39 @@
+/*
+ * Wiring (nRF9151 DK Arduino header -> OBEGRÄNSAD panel):
+ *   D13 (P0.13, SPI SCK)  -> CLK
+ *   D11 (P0.11, SPI MOSI) -> IN
+ *   D10 (P0.10, SPI CS)   -> CLA
+ *   D6  (P0.06, PWM)      -> EN
+ *   GND                   -> GND
+ */
+
+/* Flash and RAM layout without a bootloader, as used by the NCS cellular samples */
+#include <samples/cellular/nrf91_no_bootloader_partitions.dtsi>
+#include <samples/cellular/nrf91_sram_partitions.dtsi>
+
+&pinctrl {
+	pwm0_default: pwm0_default {
+		group1 {
+			psels = <NRF_PSEL(PWM_OUT0, 0, 6)>;
+		};
+	};
+
+	pwm0_sleep: pwm0_sleep {
+		group1 {
+			psels = <NRF_PSEL(PWM_OUT0, 0, 6)>;
+			low-power-enable;
+		};
+	};
+};
+
+&arduino_spi {
+	status = "okay";
+
+	obegraensad: obegraensad@0 {
+		compatible = "ikea,obegraensad";
+		reg = <0>; /* CS 0 = D10 */
+		spi-max-frequency = <500000>;
+		/* EN is active low: inverted polarity makes the pulse width the on time */
+		pwms = <&pwm0 0 PWM_USEC(100) PWM_POLARITY_INVERTED>;
+	};
+};

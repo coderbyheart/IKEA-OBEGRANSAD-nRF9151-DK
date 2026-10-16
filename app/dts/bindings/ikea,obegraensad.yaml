@@ -1,0 +1,17 @@
+description: |
+  IKEA OBEGRÄNSAD 16x16 LED panel (4 chained SCT2024 constant current drivers).
+
+  The panel's IN and CLK pins connect to SPI MOSI and SCK. CLA (latch) is
+  driven by the SPI chip select: it is low while the frame is shifted in and
+  goes high afterwards, which latches the new frame. EN (active low output
+  enable) is driven by a PWM channel to set the brightness.
+
+compatible: "ikea,obegraensad"
+
+include: spi-device.yaml
+
+properties:
+  pwms:
+    type: phandle-array
+    required: true
+    description: PWM channel connected to the EN pin
