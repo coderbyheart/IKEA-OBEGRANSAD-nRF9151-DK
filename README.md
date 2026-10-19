@@ -1,7 +1,8 @@
 # IKEA OBEGRÄNSAD on the nRF9151 DK
 
-A countdown in days on the 16x16 LED panel of the IKEA OBEGRÄNSAD, driven by an
-nRF9151 DK that gets the date and time zone from the LTE network. Based on [ph1p/ikea-led-obegraensad](https://github.com/ph1p/ikea-led-obegraensad).
+A weather forecast, a countdown in days and a clock on the 16x16 LED panel of
+the IKEA OBEGRÄNSAD, driven by an nRF9151 DK that gets the date and time zone
+from the LTE network. Based on [ph1p/ikea-led-obegraensad](https://github.com/ph1p/ikea-led-obegraensad).
 
 > Use these instructions at your own risk. Wrong wiring can damage the panel or
 > the DK.
@@ -112,24 +113,22 @@ NCS cellular samples.
 The UART log (VCOM0, `/dev/ttyACM0`, 115200 baud) shows the LTE connection and
 when the time was received.
 
-## The countdown
+## Countdown, clock and weather
 
-The DK needs a SIM card and LTE-M or NB-IoT coverage.
+The DK needs a SIM card and LTE-M or NB-IoT coverage. The weather is shown
+after boot, button 1 switches between the weather, the countdown and the clock.
+While it connects and waits for the time or the first forecast, a dot runs
+around the border.
 
-- While it connects and waits for the time, a dot runs around the border.
-- Then it shows the number of days until 31.01.2027, centered on the panel.
-  It changes at midnight local time, and shows 0 once the date is reached.
-
-Button 1 switches between the countdown, the clock and the weather.
-
-- The clock shows the hours in the top half and the minutes in the bottom half.
-  The bottom row fills up as the seconds of the current minute pass.
 - The weather shows an icon (clear, partly cloudy, cloudy, fog, rain, snow,
   thunder) and the temperature in °C for the current hour at 59.9365, 10.7707,
   from the [MET Norway Locationforecast API](https://api.met.no/weatherapi/locationforecast/2.0/documentation).
-  It is updated every 30 minutes; until the first forecast arrives, a dot runs
-  around the border. The position is set by `LATITUDE` and `LONGITUDE` in
-  `app/src/weather.c`.
+  It is updated every 30 minutes. The position is set by `LATITUDE` and
+  `LONGITUDE` in `app/src/weather.c`.
+- The countdown shows the number of days until 31.01.2027, centered on the
+  panel. It changes at midnight local time, and shows 0 once the date is reached.
+- The clock shows the hours in the top half and the minutes in the bottom half.
+  The bottom row fills up as the seconds of the current minute pass.
 
 The API is accessed over TLS. On the first start, the HARICA root certificate
 (`app/src/met_no_ca.h`) is written to the modem under security tag 42.
