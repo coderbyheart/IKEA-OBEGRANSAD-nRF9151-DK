@@ -1,7 +1,7 @@
 # IKEA OBEGRÄNSAD on the nRF9151 DK
 
-A clock on the 16x16 LED panel of the IKEA OBEGRÄNSAD, driven by an nRF9151 DK
-that gets the time and time zone from the LTE network. Based on [ph1p/ikea-led-obegraensad](https://github.com/ph1p/ikea-led-obegraensad).
+A countdown in days on the 16x16 LED panel of the IKEA OBEGRÄNSAD, driven by an
+nRF9151 DK that gets the date and time zone from the LTE network. Based on [ph1p/ikea-led-obegraensad](https://github.com/ph1p/ikea-led-obegraensad).
 
 > Use these instructions at your own risk. Wrong wiring can damage the panel or
 > the DK.
@@ -112,16 +112,33 @@ NCS cellular samples.
 The UART log (VCOM0, `/dev/ttyACM0`, 115200 baud) shows the LTE connection and
 when the time was received.
 
-## The clock
+## The countdown
 
 The DK needs a SIM card and LTE-M or NB-IoT coverage.
 
 - While it connects and waits for the time, a dot runs around the border.
-- Then it shows the hours in the top half and the minutes in the bottom half.
+- Then it shows the number of days until 31.01.2027, centered on the panel.
+  It changes at midnight local time, and shows 0 once the date is reached.
+
+Button 1 switches between the countdown, the clock and the weather.
+
+- The clock shows the hours in the top half and the minutes in the bottom half.
   The bottom row fills up as the seconds of the current minute pass.
+- The weather shows an icon (clear, partly cloudy, cloudy, fog, rain, snow,
+  thunder) and the temperature in °C for the current hour at 59.9365, 10.7707,
+  from the [MET Norway Locationforecast API](https://api.met.no/weatherapi/locationforecast/2.0/documentation).
+  It is updated every 30 minutes; until the first forecast arrives, a dot runs
+  around the border. The position is set by `LATITUDE` and `LONGITUDE` in
+  `app/src/weather.c`.
+
+The API is accessed over TLS. On the first start, the HARICA root certificate
+(`app/src/met_no_ca.h`) is written to the modem under security tag 42.
+
+Change the date with `TARGET_YEAR`, `TARGET_MONTH` and `TARGET_DAY` in
+`app/src/main.c`. Up to 999 days fit on the panel.
 
 The time zone comes from the network as well. If the network sends the time
-without a time zone, the clock shows UTC.
+without a time zone, the day changes at midnight UTC.
 
 Brightness is limited to 25 % by `BRIGHTNESS_PERCENT` in `app/src/main.c`.
 The panel driver is in `app/src/panel.c`.
@@ -136,6 +153,6 @@ The panel driver is in `app/src/panel.c`.
 | Random pixels or flicker                      | CLK/IN/CLA wiring, wire length, level shifter                  |
 | Digits are mirrored or rotated                | Panel is mounted rotated relative to `positions[]` in `app/src/panel.c` |
 | Dot keeps running around the border           | SIM card, LTE coverage, UART log                               |
-| Clock is off by whole hours                   | Network sends no time zone, clock shows UTC                    |
+| Count changes at the wrong time of day       | Network sends no time zone, so the day changes at midnight UTC |
 | `zsh: command not found: west`                | Open the toolchain shell first (see above)                     |
 | Old firmware keeps running after `west flash` | Flash with `--erase`                                           |
